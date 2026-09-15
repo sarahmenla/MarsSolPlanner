@@ -14,7 +14,7 @@ energy constraints, and pick the route that minimises it.
 ## Quickstart
 ```bash
 pip install -r requirements.txt
-python -m sol_window.demo --start 137.4,-4.6 --horizon-sols 20
+python -m sol_window.demo --start 10,10 --horizon-sols 20
 ```
 
 ## Data layers
