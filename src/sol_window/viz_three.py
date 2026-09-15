@@ -85,15 +85,6 @@ html,body{margin:0;padding:0;height:100%;background:#000;color:var(--text);
   font-size:10px;line-height:1.7;backdrop-filter:blur(6px);z-index:10;}
 #legend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;
   margin-right:7px;vertical-align:middle}
-#sol-log{position:absolute;bottom:132px;left:14px;padding:8px 11px;
-  background:var(--panel);border:1px solid var(--border);border-radius:10px;
-  font-size:10px;line-height:1.45;backdrop-filter:blur(6px);z-index:10;
-  max-height:170px;overflow-y:auto;min-width:206px;max-width:268px;}
-#sol-log .sol-log-title{font-size:9px;letter-spacing:0.12em;color:var(--dim);
-  font-weight:700;margin-bottom:5px;text-transform:uppercase}
-#sol-log .line{font-variant-numeric:tabular-nums;color:var(--text);padding:1px 0;white-space:nowrap}
-#sol-log .line.hold{color:var(--coral-80)}
-#sol-log .line.now{color:var(--accent);font-weight:600}
 #controls{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
   padding:10px 18px;background:var(--panel);border:1px solid var(--border);
   border-radius:10px;display:flex;align-items:center;gap:12px;
@@ -166,7 +157,6 @@ h3{font-size:11px;font-weight:600;margin:18px 0 8px;color:var(--text);
   #stage{right:0;bottom:280px}
   #sidebar{top:auto;left:0;right:0;bottom:0;width:100%;height:280px;
     border-left:none;border-top:1px solid var(--border)}
-  #sol-log{top:14px;bottom:auto;left:268px;max-height:132px}
 }
 </style></head>
 <body>
@@ -184,13 +174,8 @@ h3{font-size:11px;font-weight:600;margin:18px 0 8px;color:var(--text);
     <div class="status drive" id="s-status">READY</div>
   </div>
 
-  <div id="sol-log">
-    <div class="sol-log-title">Sol log</div>
-    <div id="sol-log-lines"></div>
-  </div>
-
   <div id="legend">
-    <div><span class="dot" style="background:#ff8a30"></span>Planned route</div>
+    <div><span class="dot" style="background:#ff5040"></span>Planned route</div>
     <div><span class="dot" style="background:#ffb060"></span>Rover trail</div>
     <div><span class="dot" style="background:#40e0ff"></span>Water deposits</div>
     <div><span class="dot" style="background:#40ff80"></span>Rover start</div>
@@ -239,99 +224,16 @@ document.getElementById('hud-sub').textContent =
   `${D.route.length} waypoints · ${D.deposits[0].name}`;
 
 // ============================================================
-// ALL TUNABLES — edit here for the live demo
-// ============================================================
-const CONFIG = {
-  colors: {
-    marsSky: 0x1a0a05,
-    fog: 0x2a1508,
-    sun: 0xffd8a0,
-    rim: 0x8060ff,
-    hemiSky: 0xffa060,
-    hemiGround: 0x1a0a05,
-    ribbon: 0xff8a30,
-    ribbonGlow: 0xffc070,
-    trail: 0xffb060,
-    hold: 0xff2a18,
-    roverBody: 0xd8d0c0,
-    roverPanel: 0x1a2a5a,
-    panelStrip: 0x4ad0ff,
-    wheel: 0x1a1a1a,
-    arm: 0x6a6054,
-    deposit: 0x40e0ff,
-    depositWinner: 0xffb060,
-    start: 0x40ff80,
-    dust: 0xc08050,
-    stars: 0xfff6e8,
-  },
-  scales: {
-    zScale: 0.25,
-    roverScale: 1.0,
-    ribbonWidth: 1.25,
-    ribbonLift: 0.95,
-    wheelRadius: 0.52,
-    hexRadius: 1.35,
-    hexHeight: 9.2,
-    beamHeight: 60,
-    beamRadius: 0.38,
-    ringRadius: 2.35,
-    holdHaloRadius: 4.4,
-    holdLightDistance: 24,
-    normalJitter: 0.16,
-  },
-  opacities: {
-    ribbon: 0.88,
-    ribbonEdge: 0.35,
-    beam: 0.26,
-    ring: 0.78,
-    dustMax: 0.55,
-    starMax: 0.92,
-    holdHalo: 0.38,
-  },
-  glow: {
-    holdLightIntensity: 3.4,
-    holdPulseHz: 1.65,
-    chaseSpeed: 0.035,
-    chaseRadius: 1.15,
-    chaseIntensity: 2.15,
-    chaseRange: 16,
-    panelStripEmissive: 0.9,
-  },
-  stars: {
-    count: 2400,
-    radius: 2200,
-  },
-  sun: {
-    intensity: 2.05,
-    shadowIntensity: 1.55,
-    ambient: 0.22,
-    rim: 0.18,
-    hemi: 0.28,
-  },
-  animation: {
-    solSeconds: 0.55,
-    wheelSpeed: 11,
-    ringSpin: 0.42,
-  },
-  fog: {
-    density: 0.004,
-    stormBoost: 0.008,
-  },
-};
-
-const zScale = CONFIG.scales.zScale;
-
-// ============================================================
 // SCENE SETUP
 // ============================================================
 const stage = document.getElementById('scene');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(CONFIG.colors.marsSky);
-scene.fog = new THREE.FogExp2(CONFIG.colors.fog, CONFIG.fog.density);
+scene.background = new THREE.Color(0x1a0a05);
+scene.fog = new THREE.FogExp2(0x2a1508, 0.004);
 
 function stageSize(){ return {w: stage.clientWidth, h: stage.clientHeight}; }
 
-const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 8000);
+const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 5000);
 camera.position.set(D.w*0.85, D.h*0.85, Math.max(D.w,D.h)*0.55);
 
 const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
@@ -340,7 +242,7 @@ renderer.setSize(stageSize().w, stageSize().h);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.12;
+renderer.toneMappingExposure = 1.05;
 stage.appendChild(renderer.domElement);
 camera.aspect = stageSize().w/stageSize().h;
 camera.updateProjectionMatrix();
@@ -355,30 +257,28 @@ controls.maxDistance = 1200;
 // ============================================================
 // LIGHTS
 // ============================================================
-const sun = new THREE.DirectionalLight(CONFIG.colors.sun, CONFIG.sun.intensity);
+const sun = new THREE.DirectionalLight(0xffd8a0, 1.35);
 sun.position.set(D.w*1.4, D.h*1.4, 350);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 sun.shadow.camera.left = -D.w; sun.shadow.camera.right = D.w;
 sun.shadow.camera.top = D.h; sun.shadow.camera.bottom = -D.h;
-sun.shadow.camera.near = 1;
-sun.shadow.camera.far = 2200;
-sun.shadow.bias = -0.00035;
-sun.shadow.normalBias = 0.65;
-if ('intensity' in sun.shadow) sun.shadow.intensity = CONFIG.sun.shadowIntensity;
 scene.add(sun);
-scene.add(new THREE.AmbientLight(0x604030, CONFIG.sun.ambient));
+scene.add(new THREE.AmbientLight(0x604030, 0.55));
 
-const rim = new THREE.DirectionalLight(CONFIG.colors.rim, CONFIG.sun.rim);
+// rim light for edge highlights
+const rim = new THREE.DirectionalLight(0x8060ff, 0.22);
 rim.position.set(-D.w, -D.h, 300);
 scene.add(rim);
 
-const hemi = new THREE.HemisphereLight(CONFIG.colors.hemiSky, CONFIG.colors.hemiGround, CONFIG.sun.hemi);
+// atmospheric hemisphere light
+const hemi = new THREE.HemisphereLight(0xffa060, 0.15, 0x1a0a05, 0.3);
 scene.add(hemi);
 
 // ============================================================
 // TERRAIN
 // ============================================================
+const zScale = 0.9;
 const geo = new THREE.PlaneGeometry(D.w, D.h, D.w-1, D.h-1);
 geo.rotateX(-Math.PI/2);
 geo.translate(D.w/2, D.h/2, 0);
@@ -389,34 +289,7 @@ for (let i=0; i<pos.count; i++){
 }
 geo.computeVertexNormals();
 
-// Micro-roughness: perturb normals from elevation-derived noise (not a texture)
-{
-  const nrm = geo.attributes.normal;
-  const na = nrm.array;
-  const jitter = CONFIG.scales.normalJitter;
-  for (let i=0; i<pos.count; i++){
-    const x=i%D.w, z=Math.floor(i/D.w);
-    const e0 = D.elev[z*D.w+x];
-    const eR = D.elev[z*D.w + Math.min(D.w-1, x+1)];
-    const eD = D.elev[Math.min(D.h-1, z+1)*D.w + x];
-    const h1 = Math.sin(e0*12.9898 + x*78.233 + z*37.719) * 43758.5453;
-    const n1 = h1 - Math.floor(h1);
-    const h2 = Math.sin(e0*4.123 + eR*2.17 + x*0.37) * 9187.31;
-    const n2 = h2 - Math.floor(h2);
-    const ridge = (e0 - eR) + (e0 - eD);
-    na[i*3]   += (n1 - 0.5) * jitter + ridge * 0.004;
-    na[i*3+1] += (n2 - 0.35) * jitter * 0.15;
-    na[i*3+2] += (n2 - 0.5) * jitter + ridge * 0.003;
-  }
-  for (let i=0; i<pos.count; i++){
-    const ix=i*3;
-    const lx=na[ix], ly=na[ix+1], lz=na[ix+2];
-    const len = Math.hypot(lx, ly, lz) || 1;
-    na[ix]=lx/len; na[ix+1]=ly/len; na[ix+2]=lz/len;
-  }
-  nrm.needsUpdate = true;
-}
-
+// per-vertex colouring: base Mars red + terrain-class tint + noise streaks
 const colors = new Float32Array(pos.count*3);
 const c = new THREE.Color();
 for (let i=0; i<pos.count; i++){
@@ -433,19 +306,19 @@ for (let i=0; i<pos.count; i++){
 geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
 const terrainMat = new THREE.MeshStandardMaterial({
-  vertexColors:true, roughness:0.97, metalness:0.02,
+  vertexColors:true, roughness:0.94, metalness:0.03,
 });
 const terrain = new THREE.Mesh(geo, terrainMat);
 terrain.receiveShadow = true;
-terrain.castShadow = true;
 scene.add(terrain);
 
+// Distant mountain silhouettes for depth
 const mountains = new THREE.Group();
 for (let k=0; k<12; k++){
   const shape = new THREE.Shape();
-  const startA = Math.random()*Math.PI*2;
-  const cx = D.w/2 + Math.cos(startA)*D.w*1.3;
-  const cz = D.h/2 + Math.sin(startA)*D.h*1.3;
+  const start = Math.random()*Math.PI*2;
+  const cx = D.w/2 + Math.cos(start)*D.w*1.3;
+  const cz = D.h/2 + Math.sin(start)*D.h*1.3;
   shape.moveTo(-40, 0);
   for (let x=-40; x<=40; x+=4){
     shape.lineTo(x, 20 + 25*Math.sin(x*0.15 + k) + 15*Math.random());
@@ -475,80 +348,29 @@ function toWorld(row, col, lift=1){
   return new THREE.Vector3(col, y, row);
 }
 
-function hash01(n){
-  const x = Math.sin(n * 127.1) * 43758.5453;
-  return x - Math.floor(x);
-}
-
 // ============================================================
-// ROUTE — raised orange ribbon + slow chase glow
+// ROUTE
 // ============================================================
-const routePts = D.route.map(([r,c])=>toWorld(r,c, CONFIG.scales.ribbonLift));
+const routePts = D.route.map(([r,c])=>toWorld(r,c,0.8));
 
-function buildRibbon(pts, width){
-  const n = pts.length;
-  const positions = [];
-  const up = new THREE.Vector3(0,1,0);
-  for (let i=0; i<n; i++){
-    const p = pts[i];
-    const p0 = pts[Math.max(0, i-1)];
-    const p1 = pts[Math.min(n-1, i+1)];
-    const dir = new THREE.Vector3().subVectors(p1, p0);
-    if (dir.lengthSq() < 1e-8) dir.set(0,0,1);
-    dir.normalize();
-    const side = new THREE.Vector3().crossVectors(up, dir);
-    if (side.lengthSq() < 1e-8) side.set(1,0,0);
-    side.normalize().multiplyScalar(width * 0.5);
-    const L = p.clone().add(side); L.y += 0.05;
-    const R = p.clone().sub(side); R.y += 0.05;
-    positions.push(L, R);
-  }
-  const idx = [];
-  for (let i=0; i<n-1; i++){
-    const a=i*2, b=i*2+1, c=i*2+2, d=i*2+3;
-    idx.push(a,b,c, b,d,c);
-  }
-  const g = new THREE.BufferGeometry();
-  const arr = new Float32Array(positions.length * 3);
-  positions.forEach((v,i)=>{ arr[i*3]=v.x; arr[i*3+1]=v.y; arr[i*3+2]=v.z; });
-  g.setAttribute('position', new THREE.BufferAttribute(arr, 3));
-  g.setIndex(idx);
-  g.computeVertexNormals();
-  return g;
-}
+// dashed planned route
+const routeGeo = new THREE.BufferGeometry().setFromPoints(routePts);
+const routeLine = new THREE.Line(routeGeo, new THREE.LineDashedMaterial({
+  color:0xff5040, dashSize:2.5, gapSize:1.2, transparent:true, opacity:0.55,
+}));
+routeLine.computeLineDistances();
+scene.add(routeLine);
 
-const ribbonMat = new THREE.MeshStandardMaterial({
-  color: CONFIG.colors.ribbon,
-  emissive: CONFIG.colors.ribbon,
-  emissiveIntensity: 0.35,
-  roughness: 0.45,
-  metalness: 0.15,
-  transparent: true,
-  opacity: CONFIG.opacities.ribbon,
-  side: THREE.DoubleSide,
-});
-const ribbon = new THREE.Mesh(buildRibbon(routePts, CONFIG.scales.ribbonWidth), ribbonMat);
-ribbon.receiveShadow = true;
-scene.add(ribbon);
-
-const chaseGlow = new THREE.Mesh(
-  new THREE.SphereGeometry(CONFIG.glow.chaseRadius, 14, 12),
-  new THREE.MeshBasicMaterial({
-    color: CONFIG.colors.ribbonGlow, transparent: true, opacity: 0.95, fog: false,
-  })
-);
-const chaseLight = new THREE.PointLight(CONFIG.colors.ribbonGlow, CONFIG.glow.chaseIntensity, CONFIG.glow.chaseRange);
-chaseGlow.add(chaseLight);
-scene.add(chaseGlow);
-
+// solid driven trail (grows as rover moves)
 const drivenGeo = new THREE.BufferGeometry();
 drivenGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(routePts.length*3), 3));
 drivenGeo.setDrawRange(0, 0);
 const drivenLine = new THREE.Line(drivenGeo, new THREE.LineBasicMaterial({
-  color: CONFIG.colors.trail, linewidth: 3,
+  color:0xffb060, linewidth:3,
 }));
 scene.add(drivenLine);
 
+// waypoint dots colour-coded by sol
 const waypointGroup = new THREE.Group();
 D.route.forEach(([r,c], i) => {
   const sol = D.routeSols[i] || 0;
@@ -564,75 +386,50 @@ D.route.forEach(([r,c], i) => {
 scene.add(waypointGroup);
 
 // ============================================================
-// DEPOSITS — hex prism + rotating ring + 60 m fading beam
+// DEPOSITS (with beam + label)
 // ============================================================
 const depMeshes = [];
-const beamVert = `
-  varying float vH;
-  void main(){
-    vH = position.y;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-  }
-`;
-const beamFrag = `
-  uniform vec3 uColor;
-  uniform float uOpacity;
-  varying float vH;
-  void main(){
-    float t = clamp(vH / 60.0, 0.0, 1.0);
-    float fade = (1.0 - t) * (1.0 - t);
-    gl_FragColor = vec4(uColor, uOpacity * fade);
-  }
-`;
-
 D.deposits.forEach((d, idx) => {
   const g = new THREE.Group();
   const isWinner = idx === 0;
-  const col = isWinner ? CONFIG.colors.depositWinner : CONFIG.colors.deposit;
 
-  const hex = new THREE.Mesh(
-    new THREE.CylinderGeometry(CONFIG.scales.hexRadius*0.55, CONFIG.scales.hexRadius, CONFIG.scales.hexHeight, 6),
+  // pillar/cone
+  const cone = new THREE.Mesh(
+    new THREE.ConeGeometry(1.8, 6, 12),
     new THREE.MeshStandardMaterial({
-      color: col,
-      emissive: col,
-      emissiveIntensity: isWinner ? 0.7 : 0.55,
-      roughness: 0.28, metalness: 0.55,
+      color: isWinner ? 0x40ffb0 : 0x40e0ff,
+      emissive: isWinner ? 0x109060 : 0x1090b0,
+      emissiveIntensity: 0.9,
+      roughness: 0.3, metalness: 0.6,
     })
   );
-  hex.position.y = CONFIG.scales.hexHeight * 0.5;
-  hex.castShadow = true;
-  g.add(hex);
+  cone.rotation.x = Math.PI;
+  cone.position.y = 5;
+  cone.castShadow = true;
+  g.add(cone);
 
+  // pulsing ring
   const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(CONFIG.scales.ringRadius, 0.12, 8, 36),
-    new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: CONFIG.opacities.ring })
+    new THREE.TorusGeometry(2.0, 0.18, 8, 24),
+    new THREE.MeshBasicMaterial({
+      color: isWinner ? 0x40ffb0 : 0x40e0ff, transparent: true, opacity: 0.8,
+    })
   );
   ring.rotation.x = Math.PI/2;
-  ring.position.y = 1.4;
   g.add(ring);
 
-  const beamGeo = new THREE.CylinderGeometry(
-    CONFIG.scales.beamRadius*0.15, CONFIG.scales.beamRadius, CONFIG.scales.beamHeight, 10, 1, true
-  );
-  beamGeo.translate(0, CONFIG.scales.beamHeight * 0.5, 0);
-  const beamMat = new THREE.ShaderMaterial({
-    uniforms: {
-      uColor: { value: new THREE.Color(col) },
-      uOpacity: { value: CONFIG.opacities.beam },
-    },
-    vertexShader: beamVert,
-    fragmentShader: beamFrag,
-    transparent: true,
-    depthWrite: false,
+  // sky beam
+  const beamGeo = new THREE.CylinderGeometry(0.5, 0.5, 40, 8, 1, true);
+  const beamMat = new THREE.MeshBasicMaterial({
+    color: isWinner ? 0x40ffb0 : 0x40e0ff, transparent: true, opacity: 0.14,
     side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
-    fog: false,
   });
   const beam = new THREE.Mesh(beamGeo, beamMat);
+  beam.position.y = 25;
   g.add(beam);
 
   g.position.copy(toWorld(d.row, d.col, 1));
-  Object.assign(g.userData, d, { ring, beam, hex });
+  g.userData = d;
   scene.add(g);
   depMeshes.push(g);
 });
@@ -643,14 +440,14 @@ D.deposits.forEach((d, idx) => {
 const startGroup = new THREE.Group();
 const startCone = new THREE.Mesh(
   new THREE.ConeGeometry(1.6, 5, 8),
-  new THREE.MeshStandardMaterial({color:CONFIG.colors.start, emissive:0x109050, emissiveIntensity:0.8})
+  new THREE.MeshStandardMaterial({color:0x40ff80, emissive:0x109050, emissiveIntensity:0.8})
 );
 startCone.rotation.x = Math.PI;
 startCone.position.y = 4;
 startGroup.add(startCone);
 const startRing = new THREE.Mesh(
   new THREE.TorusGeometry(2.5, 0.2, 8, 20),
-  new THREE.MeshBasicMaterial({color:CONFIG.colors.start, transparent:true, opacity:0.9})
+  new THREE.MeshBasicMaterial({color:0x40ff80, transparent:true, opacity:0.9})
 );
 startRing.rotation.x = Math.PI/2;
 startGroup.add(startRing);
@@ -658,178 +455,75 @@ startGroup.position.copy(toWorld(D.start[0], D.start[1], 1));
 scene.add(startGroup);
 
 // ============================================================
-// 6-WHEEL ROCKER-BOGIE ROVER
+// DETAILED ROVER
 // ============================================================
-function makeRover(){
-  const roverG = new THREE.Group();
-  roverG.scale.setScalar(CONFIG.scales.roverScale);
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.roverBody, metalness: 0.68, roughness: 0.34,
-  });
-  const darkMat = new THREE.MeshStandardMaterial({
-    color: 0x3a3834, metalness: 0.5, roughness: 0.48,
-  });
-  const armMat = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.arm, metalness: 0.55, roughness: 0.4,
-  });
-  const wheelMat = new THREE.MeshStandardMaterial({
-    color: CONFIG.colors.wheel, roughness: 0.92, metalness: 0.08,
-  });
+const rover = new THREE.Group();
 
-  const chassis = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.82, 3.45), bodyMat);
-  chassis.position.y = 1.22;
-  chassis.castShadow = true;
-  roverG.add(chassis);
+// main body
+const body = new THREE.Mesh(
+  new THREE.BoxGeometry(3.0, 1.4, 4.0),
+  new THREE.MeshStandardMaterial({color:0xd8d0c0, metalness:0.7, roughness:0.35})
+);
+body.castShadow = true;
+rover.add(body);
 
-  const belly = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.28, 2.6), darkMat);
-  belly.position.y = 0.78;
-  roverG.add(belly);
-
-  const panel = new THREE.Mesh(
-    new THREE.BoxGeometry(3.15, 0.08, 2.95),
-    new THREE.MeshStandardMaterial({
-      color: CONFIG.colors.roverPanel, metalness: 0.55, roughness: 0.16,
-      emissive: CONFIG.colors.roverPanel, emissiveIntensity: 0.18,
-    })
+// solar panel on top
+const panel = new THREE.Mesh(
+  new THREE.BoxGeometry(3.4, 0.12, 4.4),
+  new THREE.MeshStandardMaterial({color:0x1a2a5a, metalness:0.5, roughness:0.15, emissive:0x081020, emissiveIntensity:0.3})
+);
+panel.position.y = 0.85;
+rover.add(panel);
+// grid lines on panel
+for (let i=1; i<4; i++){
+  const g = new THREE.Mesh(
+    new THREE.BoxGeometry(3.4, 0.14, 0.05),
+    new THREE.MeshBasicMaterial({color:0x40608a})
   );
-  panel.position.set(0, 1.72, -0.12);
-  panel.castShadow = true;
-  roverG.add(panel);
-  for (let i=1; i<4; i++){
-    const grid = new THREE.Mesh(
-      new THREE.BoxGeometry(3.15, 0.09, 0.04),
-      new THREE.MeshBasicMaterial({color:0x40608a})
-    );
-    grid.position.set(0, 1.73, -1.35 + i*0.7);
-    roverG.add(grid);
-  }
-  const strip = new THREE.Mesh(
-    new THREE.BoxGeometry(0.1, 0.045, 2.7),
-    new THREE.MeshStandardMaterial({
-      color: CONFIG.colors.panelStrip,
-      emissive: CONFIG.colors.panelStrip,
-      emissiveIntensity: CONFIG.glow.panelStripEmissive,
-      roughness: 0.2, metalness: 0.4,
-    })
-  );
-  strip.position.set(1.42, 1.78, -0.12);
-  roverG.add(strip);
-
-  const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 2.15, 8), armMat);
-  ant.position.set(-0.72, 2.85, 0.85);
-  roverG.add(ant);
-  const dish = new THREE.Mesh(new THREE.CircleGeometry(0.32, 18), darkMat);
-  dish.position.set(-0.72, 3.95, 0.85);
-  dish.rotation.x = -0.95;
-  roverG.add(dish);
-
-  const armRoot = new THREE.Group();
-  armRoot.position.set(1.28, 1.05, 0.55);
-  const seg1 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 1.35), armMat);
-  seg1.position.set(0.12, 0.02, 0.35);
-  seg1.rotation.y = 0.4;
-  armRoot.add(seg1);
-  const seg2 = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 1.05), armMat);
-  seg2.position.set(0.42, -0.22, 0.95);
-  seg2.rotation.set(0.85, 0.35, 1.15);
-  armRoot.add(seg2);
-  const scoop = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.32), darkMat);
-  scoop.position.set(0.62, -0.48, 1.15);
-  armRoot.add(scoop);
-  roverG.add(armRoot);
-
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 1.75, 8), armMat);
-  mast.position.set(0.12, 2.55, 1.32);
-  roverG.add(mast);
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.38, 0.42), darkMat);
-  head.position.set(0.12, 3.48, 1.32);
-  roverG.add(head);
-
-  const wr = CONFIG.scales.wheelRadius;
-  const wheelGeo = new THREE.CylinderGeometry(wr, wr, 0.36, 16);
-  const wheels = [];
-  function addWheel(x, y, z){
-    const pivot = new THREE.Group();
-    pivot.position.set(x, y, z);
-    const mesh = new THREE.Mesh(wheelGeo, wheelMat);
-    mesh.rotation.z = Math.PI/2;
-    mesh.castShadow = true;
-    pivot.add(mesh);
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(wr*0.32, wr*0.32, 0.4, 8), darkMat);
-    hub.rotation.z = Math.PI/2;
-    pivot.add(hub);
-    roverG.add(pivot);
-    wheels.push(pivot);
-    return pivot;
-  }
-  function armBox(len, thick=0.13){
-    const m = new THREE.Mesh(new THREE.BoxGeometry(thick, thick, len), armMat);
-    m.castShadow = true;
-    return m;
-  }
-  function knuckle(x, z, h=0.58){
-    const k = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, h, 6), armMat);
-    k.position.set(x, wr + h*0.5, z);
-    roverG.add(k);
-  }
-
-  const track = 1.52;
-  const zF = 1.58, zM = 0.02, zR = -1.52;
-  addWheel(-track, wr, zF); addWheel(-track, wr, zM); addWheel(-track, wr, zR);
-  addWheel( track, wr, zF); addWheel( track, wr, zM); addWheel( track, wr, zR);
-  [-1,1].forEach(s => {
-    const x = s * track;
-    knuckle(x, zF); knuckle(x, zM); knuckle(x, zR);
-    const rocker = armBox(3.15, 0.15);
-    rocker.position.set(x, 0.98, 0.08);
-    rocker.rotation.x = 0.14;
-    roverG.add(rocker);
-    const drop = armBox(1.55, 0.11);
-    drop.position.set(x, 0.82, 0.82);
-    drop.rotation.x = -0.58;
-    roverG.add(drop);
-    const bogie = armBox(1.72, 0.12);
-    bogie.position.set(x, 0.72, -0.72);
-    bogie.rotation.x = 0.22;
-    roverG.add(bogie);
-    const link = armBox(1.05, 0.09);
-    link.position.set(x, 1.05, -0.15);
-    link.rotation.x = 0.55;
-    roverG.add(link);
-  });
-  const diff = new THREE.Mesh(new THREE.BoxGeometry(track*2.05, 0.11, 0.16), armMat);
-  diff.position.set(0, 1.32, 0.18);
-  roverG.add(diff);
-
-  const beacon = new THREE.Mesh(
-    new THREE.SphereGeometry(0.28, 14, 14),
-    new THREE.MeshBasicMaterial({color: CONFIG.colors.trail})
-  );
-  beacon.position.set(0, 1.55, 0);
-  roverG.add(beacon);
-  const beaconLight = new THREE.PointLight(CONFIG.colors.trail, 1.15, 14);
-  beaconLight.position.set(0, 1.7, 0);
-  roverG.add(beaconLight);
-
-  const holdHalo = new THREE.Mesh(
-    new THREE.SphereGeometry(CONFIG.scales.holdHaloRadius, 24, 16),
-    new THREE.MeshBasicMaterial({
-      color: CONFIG.colors.hold, transparent: true, opacity: 0,
-      depthWrite: false, side: THREE.DoubleSide,
-    })
-  );
-  holdHalo.position.y = 1.1;
-  roverG.add(holdHalo);
-  const holdLight = new THREE.PointLight(CONFIG.colors.hold, 0, CONFIG.scales.holdLightDistance);
-  holdLight.position.set(0, 1.4, 0);
-  roverG.add(holdLight);
-
-  return {group: roverG, wheels, beacon, beaconLight, holdHalo, holdLight};
+  g.position.set(0, 0.86, -2.0 + i);
+  rover.add(g);
 }
 
-const roverParts = makeRover();
-const rover = roverParts.group;
-const wheels = roverParts.wheels;
+// four wheels
+const wheelGeo = new THREE.CylinderGeometry(0.65, 0.65, 0.5, 12);
+const wheelMat = new THREE.MeshStandardMaterial({color:0x1a1a1a, roughness:0.9});
+const wheelPositions = [[-1.4,-0.9,-1.5],[1.4,-0.9,-1.5],[-1.4,-0.9,1.5],[1.4,-0.9,1.5]];
+const wheels = [];
+wheelPositions.forEach(([x,y,z]) => {
+  const w = new THREE.Mesh(wheelGeo, wheelMat);
+  w.rotation.z = Math.PI/2;
+  w.position.set(x,y,z);
+  w.castShadow = true;
+  rover.add(w);
+  wheels.push(w);
+});
+
+// mast + camera head
+const mast = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.1, 0.1, 2.4, 8),
+  new THREE.MeshStandardMaterial({color:0x888070, metalness:0.6})
+);
+mast.position.set(0, 2.0, 1.2);
+rover.add(mast);
+const head = new THREE.Mesh(
+  new THREE.BoxGeometry(0.6, 0.5, 0.8),
+  new THREE.MeshStandardMaterial({color:0x444444, metalness:0.7})
+);
+head.position.set(0, 3.1, 1.2);
+rover.add(head);
+
+// glowing beacon
+const beacon = new THREE.Mesh(
+  new THREE.SphereGeometry(0.35, 16, 16),
+  new THREE.MeshBasicMaterial({color:0xffb060})
+);
+beacon.position.set(0, 1.4, 0);
+rover.add(beacon);
+// halo light around beacon
+const beaconLight = new THREE.PointLight(0xffb060, 1.2, 15);
+beaconLight.position.set(0, 1.6, 0);
+rover.add(beaconLight);
+
 rover.position.copy(routePts[0]);
 scene.add(rover);
 
@@ -846,73 +540,28 @@ for (let i=0; i<N; i++){
 }
 dustGeo.setAttribute('position', new THREE.BufferAttribute(dustArr, 3));
 const dustMat = new THREE.PointsMaterial({
-  color: CONFIG.colors.dust, size:1.0, transparent:true, opacity:0.0, sizeAttenuation:true,
+  color:0xc08050, size:1.0, transparent:true, opacity:0.0, sizeAttenuation:true,
 });
 const dust = new THREE.Points(dustGeo, dustMat);
 scene.add(dust);
 
 // ============================================================
-// STARFIELD — fog-exempt backdrop; opacity rises with τ
+// STARS (visible when sky darkens)
 // ============================================================
 const starGeo = new THREE.BufferGeometry();
-const N_STAR = CONFIG.stars.count;
+const N_STAR = 800;
 const starArr = new Float32Array(N_STAR*3);
-const starCol = new Float32Array(N_STAR*3);
-const Rstar = CONFIG.stars.radius;
 for (let i=0; i<N_STAR; i++){
-  const theta = hash01(i*3.1) * Math.PI * 2;
-  const phi = hash01(i*7.7) * Math.PI * 0.48 + 0.06;
-  starArr[i*3]   = D.w/2 + Rstar*Math.sin(phi)*Math.cos(theta);
-  starArr[i*3+1] = Rstar*Math.cos(phi) * 0.72 + 80;
-  starArr[i*3+2] = D.h/2 + Rstar*Math.sin(phi)*Math.sin(theta);
-  const b = 0.65 + hash01(i*11.3)*0.35;
-  starCol[i*3]=b; starCol[i*3+1]=b*0.96; starCol[i*3+2]=b*0.88;
+  const r = 1500;
+  const theta = Math.random()*Math.PI*2;
+  const phi = Math.random()*Math.PI/2 + 0.1;
+  starArr[i*3]   = D.w/2 + r*Math.sin(phi)*Math.cos(theta);
+  starArr[i*3+1] = r*Math.cos(phi);
+  starArr[i*3+2] = D.h/2 + r*Math.sin(phi)*Math.sin(theta);
 }
 starGeo.setAttribute('position', new THREE.BufferAttribute(starArr, 3));
-starGeo.setAttribute('color', new THREE.BufferAttribute(starCol, 3));
-const starMat = new THREE.PointsMaterial({
-  color: CONFIG.colors.stars, size: 1.65, transparent: true, opacity: 0,
-  vertexColors: true, sizeAttenuation: true, depthWrite: false, fog: false,
-});
+const starMat = new THREE.PointsMaterial({color:0xffffff, size:1.5, transparent:true, opacity:0});
 scene.add(new THREE.Points(starGeo, starMat));
-
-// ============================================================
-// SOL LOG (from D.routeSols + D.tau only)
-// ============================================================
-function buildSolLog(){
-  const n = D.route.length;
-  const perSol = {};
-  let pathLen = 0;
-  for (let i=1; i<n; i++){
-    const a=D.route[i-1], b=D.route[i];
-    const d = Math.hypot(b[0]-a[0], b[1]-a[1]);
-    pathLen += d;
-    const sol = D.routeSols[i] ?? D.routeSols[i-1] ?? 0;
-    perSol[sol] = (perSol[sol] || 0) + d;
-  }
-  const kmPer = pathLen > 0 ? D.totalKm / pathLen : 0;
-  const maxSol = D.routeSols.length ? Math.max(...D.routeSols) : 0;
-  const el = document.getElementById('sol-log-lines');
-  const parts = [];
-  for (let s=0; s<=maxSol; s++){
-    const tv = D.tau[Math.min(s, D.tau.length-1)] ?? 0;
-    const hold = tv > 1.0;
-    const km = (perSol[s] || 0) * kmPer;
-    const text = hold
-      ? `Sol ${s} · τ ${tv.toFixed(2)} · HOLD`
-      : `Sol ${s} · τ ${tv.toFixed(2)} · DRIVE ${km.toFixed(1)} km`;
-    parts.push(`<div class="line${hold?' hold':''}" data-sol="${s}">${text}</div>`);
-  }
-  el.innerHTML = parts.join('');
-}
-buildSolLog();
-
-function highlightSolLog(sol){
-  const cur = Math.floor(sol);
-  document.querySelectorAll('#sol-log .line').forEach(el => {
-    el.classList.toggle('now', Number(el.dataset.sol) === cur);
-  });
-}
 
 // ============================================================
 // UI CONTROLS
@@ -930,6 +579,7 @@ scrub.oninput = () => {
   playing = false; btnPlay.textContent = '▶ Play';
 };
 
+// tooltip
 const tooltip = document.getElementById('tooltip');
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -961,32 +611,20 @@ function updateHUD(sol, roverPos){
   document.getElementById('s-pos').textContent = `(${Math.round(roverPos.z)}, ${Math.round(roverPos.x)})`;
   document.getElementById('s-elev').textContent = Math.round(roverPos.y/zScale + D.eMin) + ' m';
   const st = document.getElementById('s-status');
-  const holding = progress < 1 && tv > 1.0;
   if (progress >= 1){ st.className = 'status arrive'; st.textContent = 'ARRIVED · SAMPLING ICE'; }
-  else if (holding){ st.className = 'status hold'; st.textContent = 'SAFETY HOLD · τ > 1.0'; }
+  else if (tv > 1.0){ st.className = 'status hold'; st.textContent = 'SAFETY HOLD · τ > 1.0'; }
   else { st.className = 'status drive'; st.textContent = 'DRIVING'; }
   document.getElementById('sol-label').textContent = `Sol ${sol.toFixed(1)}`;
-  highlightSolLog(sol);
 
-  dustMat.opacity = Math.max(0, Math.min(CONFIG.opacities.dustMax, (tv-0.6)*1.2));
+  // atmospheric response
+  dustMat.opacity = Math.max(0, Math.min(0.55, (tv-0.6)*1.2));
   const dark = Math.max(0, Math.min(1, (tv-0.5)*0.9));
   scene.background = new THREE.Color().setRGB(
     0.10*(1-dark*0.7), 0.04*(1-dark*0.5), 0.02
   );
-  sun.intensity = Math.max(0.15, CONFIG.sun.intensity*Math.exp(-1.2*tv));
-  starMat.opacity = dark * CONFIG.opacities.starMax;
-  scene.fog.density = CONFIG.fog.density + dark*CONFIG.fog.stormBoost;
-
-  const pulse = 0.5 + 0.5 * Math.sin(clock.elapsedTime * CONFIG.glow.holdPulseHz * Math.PI * 2);
-  if (holding){
-    roverParts.holdLight.intensity = CONFIG.glow.holdLightIntensity * (0.55 + 0.45*pulse);
-    roverParts.holdHalo.material.opacity = CONFIG.opacities.holdHalo * (0.4 + 0.6*pulse);
-    roverParts.holdHalo.scale.setScalar(0.85 + 0.25*pulse);
-  } else {
-    roverParts.holdLight.intensity = 0;
-    roverParts.holdHalo.material.opacity = 0;
-  }
-  return { tv, holding };
+  sun.intensity = Math.max(0.15, 1.35*Math.exp(-1.2*tv));
+  starMat.opacity = dark*0.6;
+  scene.fog.density = 0.004 + dark*0.008;
 }
 
 // ============================================================
@@ -1067,18 +705,19 @@ const clock = new THREE.Clock();
 function animate(){
   const dt = clock.getDelta();
   if (playing){
-    progress += dt / (D.tau.length * CONFIG.animation.solSeconds);
+    progress += dt / (D.tau.length * 0.55);
     if (progress > 1){ progress = 1; playing = false; btnPlay.textContent = '▶ Play'; }
     scrub.value = progress * 1000;
   }
   const iF = progress * (routePts.length - 1);
   const i0 = Math.floor(iF), i1 = Math.min(routePts.length-1, i0+1), t = iF-i0;
   rover.position.lerpVectors(routePts[i0], routePts[i1], t);
-  rover.position.y += 1.0;
+  rover.position.y += 1.6;
   if (i1 > i0){
     const dir = new THREE.Vector3().subVectors(routePts[i1], routePts[i0]);
     rover.rotation.y = Math.atan2(dir.x, dir.z);
   }
+  wheels.forEach(w => w.rotation.x += dt * 8 * (playing ? 1 : 0));
 
   drivenGeo.setDrawRange(0, i0+1);
   const dp = drivenGeo.attributes.position.array;
@@ -1093,17 +732,9 @@ function animate(){
     ? D.routeSols[Math.min(i0, D.routeSols.length-1)] + (i1>i0 ? t*0.25 : 0)
     : progress * D.tau.length;
   currentSol = sol;
-  const { tv, holding } = updateHUD(sol, rover.position);
+  updateHUD(sol, rover.position);
 
-  const driving = playing && progress < 1 && !holding;
-  wheels.forEach(w => { if (driving) w.rotation.x += dt * CONFIG.animation.wheelSpeed; });
-
-  const cu = (clock.elapsedTime * CONFIG.glow.chaseSpeed) % 1;
-  const cF = cu * (routePts.length - 1);
-  const c0 = Math.floor(cF), c1 = Math.min(routePts.length-1, c0+1);
-  chaseGlow.position.lerpVectors(routePts[c0], routePts[c1], cF-c0);
-  chaseGlow.position.y += 0.35;
-
+  // dust drift
   const dparr = dustGeo.attributes.position.array;
   const wind = 8 + dustMat.opacity * 15;
   for (let i=0; i<N; i++){
@@ -1112,16 +743,19 @@ function animate(){
   }
   dustGeo.attributes.position.needsUpdate = true;
 
-  roverParts.beacon.scale.setScalar(1 + 0.4 * Math.sin(clock.elapsedTime*5));
-  roverParts.beaconLight.intensity = 1.2 + 0.5 * Math.sin(clock.elapsedTime*5);
+  // beacon pulse
+  beacon.scale.setScalar(1 + 0.4 * Math.sin(clock.elapsedTime*5));
+  beaconLight.intensity = 1.2 + 0.5 * Math.sin(clock.elapsedTime*5);
 
+  // deposit ring pulses
   depMeshes.forEach((g, i) => {
-    g.userData.ring.rotation.z += dt * CONFIG.animation.ringSpin;
-    g.userData.ring.scale.setScalar(1 + 0.12 * Math.sin(clock.elapsedTime*2 + i));
-    g.userData.beam.material.uniforms.uOpacity.value =
-      CONFIG.opacities.beam * (0.82 + 0.18 * Math.sin(clock.elapsedTime*1.5 + i));
+    const ring = g.children[1];
+    ring.scale.setScalar(1 + 0.25 * Math.sin(clock.elapsedTime*2 + i));
+    const beam = g.children[2];
+    beam.material.opacity = 0.10 + 0.06 * Math.sin(clock.elapsedTime*1.5 + i);
   });
 
+  // fly camera
   if (flying){
     controls.enabled = false;
     const look = rover.position.clone();
