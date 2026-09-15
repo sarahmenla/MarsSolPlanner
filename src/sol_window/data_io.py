@@ -29,19 +29,19 @@ def load_elevation(tile: str | None = None, shape=(256, 256), seed=0) -> np.ndar
     # Multi-scale Mars-like terrain: broad basins + mid ridges + fine texture
     z = (
         80 * np.sin(2.5 * x) * np.cos(1.8 * y)
-        + 40 * np.sin(7 * x + 1.3) * np.sin(6 * y)
-        + 15 * np.sin(19 * x) * np.cos(17 * y)
+        + 15 * np.sin(7 * x + 1.3) * np.sin(6 * y)
+        + 3 * np.sin(19 * x) * np.cos(17 * y)
         + 3 * rng.standard_normal(shape)
     )
     # A prominent ridge line — worth going around
-    z += 120 * np.exp(-((x - 0.55) ** 2) / 0.008)
+    z += 45 * np.exp(-((x - 0.55) ** 2) / 0.015)
     # Impact crater
     crater_r = np.sqrt((x - 0.75) ** 2 + (y - 0.30) ** 2)
-    z -= 50 * np.exp(-crater_r ** 2 / 0.006)
-    z += 30 * np.exp(-((crater_r - 0.08) ** 2) / 0.0005)  # crater rim
+    z -= 20 * np.exp(-crater_r ** 2 / 0.012)
+    z += 10 * np.exp(-((crater_r - 0.08) ** 2) / 0.002)  # crater rim
     # Second crater
     crater2 = np.sqrt((x - 0.25) ** 2 + (y - 0.70) ** 2)
-    z -= 35 * np.exp(-crater2 ** 2 / 0.008)
+    z -= 15 * np.exp(-crater2 ** 2 / 0.014)
     return z.astype(np.float32)
 
 

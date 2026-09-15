@@ -30,9 +30,9 @@
   "tau_hold_threshold": 1.0,
   "winner": {
     "name": "Deposit-C RSL-associated",
-    "eta_sols": 9.684396832714423,
-    "distance_km": 8.18553143910877,
-    "waypoints": 150,
+    "eta_sols": 9.339790029216879,
+    "distance_km": 7.689297642072307,
+    "waypoints": 155,
     "idle_sols": 4,
     "peak_tau": 2.119506359100342,
     "yield_kg_m2": 200.0,
@@ -44,32 +44,32 @@
   "ranked_deposits": [
     {
       "name": "Deposit-C RSL-associated",
-      "eta_sols": 9.684396832714423,
-      "distance_km": 8.18553143910877,
+      "eta_sols": 9.339790029216879,
+      "distance_km": 7.689297642072307,
       "yield_kg_m2": 200.0,
       "row": 150,
       "col": 60
     },
     {
       "name": "Deposit-D neutron-spectrometer hit",
-      "eta_sols": 14.937561862601225,
-      "distance_km": 15.750089082145767,
+      "eta_sols": 11.443920321001423,
+      "distance_km": 10.719245262242048,
       "yield_kg_m2": 40.0,
       "row": 90,
       "col": 190
     },
     {
       "name": "Deposit-B buried lens",
-      "eta_sols": 15.268275949144561,
-      "distance_km": 16.22631736676816,
+      "eta_sols": 13.314957104013049,
+      "distance_km": 13.413538229778785,
       "yield_kg_m2": 80.0,
       "row": 210,
       "col": 220
     },
     {
       "name": "Deposit-A shallow ice sheet",
-      "eta_sols": 16.1524187874352,
-      "distance_km": 17.499483053906683,
+      "eta_sols": 14.100422573642726,
+      "distance_km": 14.544608506045522,
       "yield_kg_m2": 120.0,
       "row": 240,
       "col": 230
@@ -94,56 +94,56 @@
       "sol": 2,
       "tau": 1.1948751211166382,
       "status": "hold",
-      "row": 65,
-      "col": 36
+      "row": 66,
+      "col": 37
     },
     {
       "sol": 3,
       "tau": 1.7007349729537964,
       "status": "hold",
-      "row": 65,
-      "col": 36
+      "row": 66,
+      "col": 37
     },
     {
       "sol": 4,
       "tau": 2.119506359100342,
       "status": "hold",
-      "row": 65,
-      "col": 36
+      "row": 66,
+      "col": 37
     },
     {
       "sol": 5,
       "tau": 1.492707371711731,
       "status": "hold",
-      "row": 65,
-      "col": 36
+      "row": 66,
+      "col": 37
     },
     {
       "sol": 6,
       "tau": 0.5243229269981384,
       "status": "drive",
-      "row": 66,
-      "col": 37
+      "row": 67,
+      "col": 38
     },
     {
       "sol": 7,
       "tau": 0.5833694338798523,
       "status": "drive",
-      "row": 94,
-      "col": 49
+      "row": 96,
+      "col": 50
     },
     {
       "sol": 8,
       "tau": 0.5617130994796753,
       "status": "drive",
-      "row": 122,
-      "col": 60
+      "row": 126,
+      "col": 59
     },
     {
       "sol": 9,
       "tau": 0.5217493176460266,
       "status": "arrive",
-      "row": 146,
+      "row": 148,
       "col": 57
     }
   ],
